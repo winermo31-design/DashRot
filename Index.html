@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOMETRY DASH LOBOTOMY SIMULATOR 2.2</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #0f0;
+            font-size: 3rem;
+            text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+            animation: shake 0.1s infinite;
+        }
+
+        .subtitle {
+            color: #ff00ff;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: #111;
+            border: 3px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            width: 250px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .card:hover {
+            border-color: #ff0000;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+        }
+
+        .btn {
+            background: #ff4500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 5px #999;
+            margin: 10px 0;
+        }
+
+        .btn:active {
+            background-color: #ff0000;
+            box-shadow: 0 2px #666;
+            transform: translateY(3px);
+        }
+
+        /* Brainrot Visual Overrides */
+        .fire-in-the-hole {
+            background: linear-gradient(45deg, #ff4500, #ffcc00);
+            border: 4px solid #fff;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        .jumpscare-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.05s ease-in;
+        }
+
+        .jumpscare-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .jumpscare-text {
+            color: #00ffff;
+            font-size: 5rem;
+            font-weight: bold;
+            letter-spacing: 10px;
+            animation: flash 0.2s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            100% { transform: translate(-1px, -2px) rotate(-1deg); }
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        #cube-container {
+            margin: 40px auto;
+            width: 100px;
+            height: 100px;
+            background-color: #00ff00;
+            border: 5px solid #0000ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .rotating {
+            animation: spin 0.5s infinite linear;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🔥 GEOMETRY DASH LOBOTOMY STATION 🔥</h1>
+    <p class="subtitle">NORMAL FACE IS WATCHING YOU. SCREEN REFRESH IS NOT AN OPTION.</p>
+
+    <!-- Score Counter -->
+    <h2>ATTEMPTS CONSUMED: <span id="attempt-counter" style="color: red;">0</span></h2>
+
+    <!-- Interactive Game Box -->
+    <div class="card fire-in-the-hole" style="margin: 0 auto; width: 320px;">
+        <h3>CLICK TO JUMP</h3>
+        <p>If you crash, you are a generation retro fan.</p>
+        <div id="cube-container" onclick="jumpCube()">🟩</div>
+        <button class="btn" onclick="triggerLobotomySound()">SAY THE LINE</button>
+    </div>
+
+    <!-- Brain Rot Grid -->
+    <div class="grid-container">
+        
+        <div class="card">
+            <h3>🔥 Level Difficulty</h3>
+            <p style="font-size: 3rem; margin: 5px 0;">🙂</p>
+            <p><strong>FIRE IN THE HOLE!!!</strong></p>
+            <button class="btn" onclick="spamSound('fire')">Spam Fire</button>
+        </div>
+
+        <div class="card" style="background-color: #1a0033;">
+            <h3>⚠️ Jumpscare Engine</h3>
+            <p>Do absolutely not click this button if you have a weak heart or fear dark rooms.</p>
+            <button class="btn" style="background: #800080;" onclick="triggerCongregation()">CONGREGATION</button>
+        </div>
+
+        <div class="card">
+            <h3>🟢 Checkpoint System</h3>
+            <p>Every time you press this, nothing happens, just like practice mode when you forget to place them.</p>
+            <button class="btn" style="background: #008000;" onclick="spamSound('check')">Place Diamond</button>
+        </div>
+
+        <div class="card">
+            <h3>🗣️ RobTop Status</h3>
+            <p id="robtop-quote">"Check steam."</p>
+            <button class="btn" style="background: #444;" onclick="rotateQuote()">Update Status</button>
+        </div>
+
+    </div>
+
+    <!-- The Congregation Jumpscare Overlay -->
+    <div id="jumpscare" class="jumpscare-overlay">
+        <div class="jumpscare-text">CONGREGATION</div>
+        <p style="color: #fff; font-size: 1.5rem; margin-top: 20px;">🔊 [Distant, incredibly slow drop playing] 🔊</p>
+        <div style="width: 200px; height: 200px; background: #555; border: 10px solid #800080; margin-top: 40px; animation: spin 4s infinite linear;"></div>
+    </div>
+
+    <!-- Web Audio API Synthesizers to prevent needing external file links -->
+    <script>
+        let attempts = 0;
+        const counterEl = document.getElementById('attempt-counter');
+        const cubeEl = document.getElementById('cube-container');
+        const jumpscareEl = document.getElementById('jumpscare');
+        const quoteEl = document.getElementById('robtop-quote');
+
+        const quotes = [
+            "Check steam.",
+            "RubRub is coding 2.21...",
+            "Why is Generation Retro so bad?",
+            "Water on the hill!!",
+            "Sikky is screaming right now.",
+            "GuitarHeroStyles drama flashbacks.",
+            "That's an extreme demon layout."
+        ];
+
+        // Synthesize retro sounds using Web Audio API so it works out of the box
+        function playTone(freq, type, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.value = freq;
+            
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function jumpCube() {
+            attempts++;
+            counterEl.innerText = attempts;
+            
+            // Trigger jump animation
+            cubeEl.classList.add('rotating');
+            playTone(150, 'square', 0.15);
+            
+            setTimeout(() => {
+                cubeEl.classList.remove('rotating');
+                // Crashing sound 30% of the time
+                if(Math.random() < 0.3) {
+                    playTone(60, 'sawtooth', 0.4);
+                }
+            }, 300);
+        }
+
+        function triggerLobotomySound() {
+            // High pitch to low pitch drop mock
+            playTone(300, 'triangle', 0.5);
+            setTimeout(() => playTone(120, 'sawtooth', 0.3), 100);
+            alert("🔥 FIRE IN THE HOLE!!! 🔥");
+        }
+
+        function spamSound(type) {
+            attempts += 5;
+            counterEl.innerText = attempts;
+            if (type === 'fire') {
+                playTone(220, 'sawtooth', 0.1);
+                playTone(440, 'sine', 0.1);
+            } else {
+                playTone(600, 'sine', 0.05);
+            }
+        }
+
+        function rotateQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            quoteEl.innerText = quotes[randomIndex];
+            playTone(800, 'triangle', 0.05);
+        }
+
+        function triggerCongregation() {
+            jumpscareEl.classList.add('jumpscare-active');
+            
+            // Ultra deep bass note drone
+            playTone(40, 'sine', 3);
+            playTone(45, 'sawtooth', 3);
+
+            setTimeout(() => {
+                jumpscareEl.classList.remove('jumpscare-active');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
